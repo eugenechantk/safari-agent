@@ -3,12 +3,14 @@ const CopyPlugin = require('copy-webpack-plugin');
 const ejs = require('ejs');
 const {version} = require('./package.json');
 
+const isDevelopment = process.env.NODE_ENV !== 'production';
+
 module.exports = {
   context: path.resolve(__dirname, 'src'),
   entry: {
     'popup/popup': "./popup/index.tsx",
-    content: "./content.ts",
-    background: "./background.ts",
+    content: "./content.js",
+    background: "./background.js",
   },
   output: {
     path: path.join(__dirname, "dist"),
@@ -35,7 +37,24 @@ module.exports = {
             loader: "sass-loader" // Compiles Sass to CSS
           }
         ]
-      }
+      },
+      {
+        test: /\.(js|jsx)$/,
+        use: [
+          {
+            loader: 'source-map-loader',
+          },
+          {
+            loader: require.resolve('babel-loader'),
+            options: {
+              // plugins: [
+              //   isDevelopment && require.resolve('react-refresh/babel'),
+              // ].filter(Boolean),
+            },
+          },
+        ],
+        exclude: /node_modules/,
+      },
     ]
   },
   plugins: [
