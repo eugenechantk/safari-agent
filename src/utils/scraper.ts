@@ -7,22 +7,22 @@ export const scrapeDOM = () => {
     // const hasClickableRole =
     //   element.getAttribute("role") === "button" ||
     //   element.getAttribute("role") === "link";
-    const clickableTags = ["a", "button", "input"];
+    const clickableTags = ["a", "button"];
     const isClickableTag = clickableTags.includes(tagName);
-    const isClickableInput =
-      tagName === "input" &&
-      ["submit", "button", "reset", "image"].includes(element.getAttribute("type") ?? "");
+    // const isClickableInput =
+    //   tagName === "input" &&
+    //   ["submit", "button", "reset", "image"].includes(element.getAttribute("type") ?? "");
 
     const isNotAtOrigin =
       element.getBoundingClientRect().x !== 0 &&
       element.getBoundingClientRect().y !== 0;
 
-    const hasDomain =
-      !element.href || element.href.includes(window.location.hostname);
+    // const hasDomain =
+    //   !element.href || element.href.includes(window.location.hostname);
     return (
-      (isClickableTag || isClickableInput) &&
-      isNotAtOrigin &&
-      hasDomain
+      isClickableTag &&
+      isNotAtOrigin
+      // hasDomain
     );
   });
   
@@ -57,5 +57,13 @@ export const scrapeDOM = () => {
   //   };
   //   items.push(JSON.stringify(temp_dict));
   // }
-  return clickableElements
+  return clickableElements.slice(0, 30)
+};
+
+export const getRandomClickableElement = (clickableElements: HTMLElement[]) => {
+  // Select a random element from the clickable elements
+  const randomIndex = Math.floor(Math.random() * clickableElements.length);
+  const randomClickableElement = clickableElements[randomIndex];
+
+  return randomClickableElement;
 };

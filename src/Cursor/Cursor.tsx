@@ -9,12 +9,12 @@ const Circle = styled.div`
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
 `;
 
-const GlassCircle = styled(Circle)<{clicked: boolean}>`
+const GlassCircle = styled(Circle)<{ clicked: string }>`
   background-color: rgba(255, 255, 255, 0.5);
-  animation: darkenBackground 1s linear infinite;
+  animation: darkenBackground 1s linear;
 
   ${(props) =>
-    props.clicked && `@keyframes darkenBackground {
+    props.clicked === "true" && `@keyframes darkenBackground {
     0% {
       background-color: rgba(255, 255, 255, 0.5);
     }
@@ -27,10 +27,8 @@ const GlassCircle = styled(Circle)<{clicked: boolean}>`
   }`}
 `;
 
-const Cursor = ({clicked}: {clicked: boolean}) => {
-  return (
-    <GlassCircle clicked={clicked}/>
-  );
+const Cursor = ({ clicked }: { clicked: boolean }) => {
+  return <GlassCircle clicked={clicked ? "true" : "false"} />;
 };
 
 export default Cursor;
