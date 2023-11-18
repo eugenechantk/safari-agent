@@ -6,14 +6,14 @@ import { StyleSheetManager } from "styled-components";
 import { CursorContainer } from "./Cursor";
 import { getElementCoordinates, smoothScrollTo } from "./utils/domManipulation";
 
-window.addEventListener("load", function () {
-  const message = { greeting: "Sending from content script; page loaded" };
-  const items = scrapeDOM();
-  // console.log("Clickables:", items);
-  const randomSelectedElement = getRandomClickableElement(items);
-  // console.log("Random clickable element:", randomSelectedElement);
-  browser.runtime.sendMessage(message);
-});
+// window.addEventListener("load", function () {
+//   const message = { greeting: "Sending from content script; page loaded" };
+//   const items = scrapeDOM();
+//   // console.log("Clickables:", items);
+//   const randomSelectedElement = getRandomClickableElement(items);
+//   // console.log("Random clickable element:", randomSelectedElement);
+//   browser.runtime.sendMessage(message);
+// });
 
 const body = document.querySelector("body");
 const app = document.createElement("div");
@@ -50,45 +50,52 @@ const App = () => {
   const [cursorClicked, setCursorClicked] = React.useState(false);
   const [wasclicked, setWasclicked] = React.useState(false);
 
-  React.useEffect(() => {
-    const simulateClick = async () => {
+  window.addEventListener("load", async () => {
+    console.log("Page loaded");
+    const items = scrapeDOM();
+    // This is where you will send the DOM to the background script for AI processing
+    // For now, just simulate a random click
+    let nextElement;
+    await new Promise((resolve) => {
       setTimeout(() => {
-        // listen();
-        // setupListeners();
-        const items = scrapeDOM();
-        const nextElement = getRandomClickableElement(items);
-        console.log(nextElement);
-        const nextPosition = getElementCoordinates(nextElement);
-        console.log(nextElement.getBoundingClientRect());
-        console.log(nextElement, nextPosition);
-
-
-        const scrolledBy = nextPosition.y >= window.innerHeight ? nextPosition.y - window.innerHeight / 2 + 180 : nextPosition.y;
-        const scrollTime = nextPosition.y >= window.innerHeight ? scrolledBy * 0.1 : 1000;
-        if (nextPosition.y >= window.innerHeight) {
-          // Scrolling the page itself
-          smoothScrollTo(scrolledBy, scrollTime)
-          // Set the cursor position relative to the window
-          const newPos = {
-            x: nextPosition.x - 22,
-            y: nextPosition.y - 22,
-          };
-          setPosition(newPos);
-        } else {
-          setPosition(nextPosition);
-        }
-        setTimeout(() => {
-          setCursorClicked(true);
-        }, scrollTime);
-        setTimeout(() => {
-          nextElement.click();
-          setWasclicked(false);
-          setCursorClicked(false);
-        }, 1500);
+        console.log("async get random clickable element");
+        nextElement = getRandomClickableElement(items);
+        resolve();
       }, 1500);
-    };
-    simulateClick();
-  }, []);
+    });
+    await simulateClick(nextElement);
+  });
+
+  const simulateClick = async (elementToClick) => {
+    console.log("simulating click for: ", elementToClick);
+    let nextPosition = elementToClick.getBoundingClientRect();
+    const scrolledBy =
+      nextPosition.y >= window.innerHeight
+        ? nextPosition.y - window.innerHeight / 2 + 180
+        : nextPosition.y;
+    const scrollTime =
+      nextPosition.y >= window.innerHeight ? scrolledBy * 0.5 : 1000;
+    if (nextPosition.y >= window.innerHeight) {
+      // Set the cursor position relative to the window
+      const newPos = {
+        x: nextPosition.x - 22,
+        y: nextPosition.y - 22,
+      };
+      setPosition(newPos);
+      // Scrolling the page itself
+      await smoothScrollTo(scrolledBy, scrollTime);
+    } else {
+      setPosition(nextPosition);
+    }
+    setTimeout(() => {
+      setCursorClicked(true);
+    }, scrollTime);
+    setTimeout(() => {
+      elementToClick.click();
+      setWasclicked(false);
+      setCursorClicked(false);
+    }, 1500);
+  };
 
   React.useEffect(() => {
     console.log(cursorClicked, typeof cursorClicked);

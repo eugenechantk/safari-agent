@@ -8,6 +8,8 @@ import Cursor from "./Cursor";
 //   left: ${(props) => props.left}px;
 // `;
 
+import { useEffect, useState } from "react";
+
 export const CursorContainer = ({
   position,
   clicked,
@@ -15,14 +17,47 @@ export const CursorContainer = ({
   position: { x: number; y: number };
   clicked: boolean;
 }) => {
-  const [active, setActive] = React.useState(false);
-  console.log("coordinates passed to cursor", position);
+  const [active, setActive] = useState(false);
+  const [cursorPosition, setCursorPosition] = useState(position);
+
+  // useEffect(() => {
+  //   setCursorPosition(position);
+  //   setActive(true);
+  // }, [position]);
+
+  // const easeInOutQuad = (t: number, b: number, c: number, d: number) => {
+  //   t /= d / 2;
+  //   if (t < 1) return (c / 2) * t * t + b;
+  //   t--;
+  //   return (-c / 2) * (t * (t - 2) - 1) + b;
+  // };
+
+  // const smoothScrollTo = (endY: number, duration: number) => {
+  //   const startY = window.scrollY;
+  //   const change = endY - startY;
+  //   const startTime = performance.now();
+
+  //   const scrollStep = (timestamp: number) => {
+  //     const elapsed = timestamp - startTime;
+  //     window.scrollTo(0, easeInOutQuad(elapsed, startY, change, duration));
+  //     if (elapsed < duration) {
+  //       window.requestAnimationFrame(scrollStep);
+  //     }
+  //   };
+
+  //   window.requestAnimationFrame(scrollStep);
+  // };
 
   return (
-    <CSSTransition in={active} timeout={300} onExited={() => setActive(false)}>
-      <div style={{ top: position.y, left: position.x, position: "absolute" }}>
-        <Cursor clicked={clicked} />
-      </div>
-    </CSSTransition>
+    <div
+      style={{
+        top: cursorPosition.y,
+        left: cursorPosition.x,
+        position: "absolute",
+        transition: "top 0.3s ease-in-out, left 0.3s ease-in-out",
+      }}
+    >
+      <Cursor clicked={clicked} />
+    </div>
   );
 };
